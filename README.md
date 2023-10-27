@@ -338,6 +338,7 @@ Results:
 18. Use `rsync` utility to backup all the files in the log directory __/var/log__ into __/home/recovery/logs__ (This is required before mounting the file system)
 
 `sudo rsync -av /var/log/. /home/recovery/logs/`
+
 Results:
 
 ![](./images/43.png)
