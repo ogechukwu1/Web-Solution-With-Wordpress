@@ -814,59 +814,219 @@ Result:
 
 Install mysql on the db-server
 
+`sudo yum update`
+
+Result:
+
+![](./images/91.png)
+
+`sudo yum install mysql-server`
+
+Result:
+
+![](./images/92.png)
 
 
 
+We now need to verify that the service is up and running by using `sudo systemctl status mysqld`, if it is not running, restart the service and enable it so it will be running even after reboot:
+
+`sudo systemctl restart mysqld`
+
+`sudo systemctl enable mysqld`
+
+
+Result:
+
+![](./images/93.png)
+
+
+## Configuring the DB to work with WordPress
+
+
+On your db-server, We need to create a user for the wordpress server to connect to the database.
+
+`sudo mysql`
+
+`mysql>` CREATE DATABASE wordpress;
+
+`mysql>` CREATE USER 'myuser'@'(Web-Server-Private-IP-Address)' 
+IDENTIFIED BY 'mypass';
+
+`mysql>` GRANT ALL ON wordpress.* TO 'myuser'@'(Web-Server-Private-IP-Address)';
+
+`mysql>` FLUSH PRIVILEGES;
+
+`mysql>` SHOW DATABASES;
+
+`mysql>` exit
 
 
 
+Result:
+
+![](./images/100.png)
+
+
+## Configure WordPress to connect to remote database.
+
+Here we are to open MySQL port 3306 on DB Server EC2. For extra security, you shall allow access to the DB server ONLY from your Web Server’s IP address, so in the Inbound Rule configuration specify source as /32.
+
+Result:
+
+open port 3306 on your db-server and input your webserver private ip address/32 on the source.
+
+![](./images/101.png)
+
+Go to your webserver and install MySQL client and test that you can connect from your Web Server to your DB server by using mysql-client
 
 
 
+`sudo yum install mysql`
+
+
+Result:
+
+![](./images/102.png)
+
+Create login to the database on the db server
+
+`sudo mysql -u <user> -p -h <DB-Server-Private-IP-address>`
+
+Note that, it's the name of the user and password you created in mysql server on the db server.
+
+`sudo mysql -u ogechukwu -p -h 172.31.6.33`
+
+password:Ogechukwu@1
+
+Result:
+
+![](./images/104.png)
+
+
+Verify if you can successfully execute SHOW DATABASES; command and see a list of existing databases.
+
+Result:
+
+![](./images/105.png)
 
 
 
+## Change permissions and configuration so Apache could use WordPress:
+
+Here we need to create a configuration file for wordpress in order to point client requests to the wordpress directory.
+
+
+`sudo vi /etc/httpd/conf.d/wordpress.conf`
+
+Result:
+
+![](./images/107.png)
+
+And copy and paste the lines below:
+
+The ip address is the private ip of your db-server.
+
+
+`<VirtualHost *:80>`
+
+`ServerAdmin ogechukwu@172.31.6.33`
+
+`DocumentRoot /var/www/html/wordpress`
+
+`<Directory "/var/www/html/wordpress">`
+
+`Options Indexes FollowSymLinks`
+
+`AllowOverride all`
+
+`Require all granted`
+
+`</Directory>`
+
+`ErrorLog /var/log/httpd/wordpress_error.log`
+
+`CustomLog /var/log/httpd/wordpress_access.log common`
+
+`</VirtualHost>`
+
+
+Result:
+
+![](./images/106.png)
 
 
 
+To apply the changes, restart Apache.
+
+`sudo systemctl restart httpd`
+
+Result:
+
+![](./images/108.png)
+
+
+Edit the wp-config file.
+
+`sudo vi /var/www/html/wordpress/wp-config.php`
+
+Result:
+
+![](./images/110.png)
+
+And add the following:
+
+
+`define('DB_NAME', 'wordpress');`
+
+`define('DB_USER', 'ogechukwu');`
+
+`define('DB_PASSWORD', 'Ogechukwu@1');`
+
+`define('DB_HOST 'db-Server-Private-IP-Address');`
+
+`define('DB_CHARSET', 'utf8');`
+
+`define('DB_COLLATE', '');`
+
+
+Result:
+
+![](./images/109.png)
 
 
 
+Go to you webserver and Enable TCP port 80 in Inbound Rules configuration for your Web Server EC2 (enable from everywhere 0.0.0.0/0 or from your workstation’s IP)
+
+Result:
+
+![](./images/111.png)
 
 
 
+Try to access from your browser the link to your WordPress.
 
 
+`http://<Web-Server-Public-IP-Address>/wordpress/`
 
+paste your public ip address of your webserver on your browser.
 
+Result:
 
+_choose your language_
 
+![](./images/112.png)
 
+_fill the information_
 
+![](./images/113.png)
 
+_log in your credentials_
 
+![](./images/114.png)
 
+_finally your wordpress has successfully connected to your remote MySQL database_ 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](./images/115.png)
 
 
 
