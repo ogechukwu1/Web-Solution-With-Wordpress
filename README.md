@@ -50,11 +50,11 @@ __The 3 layers__
 
 * __Data Access or Management Layer (DAL):__ This is the layer for computer data storage and data access. Database Server or File System Server such as FTP server, or NFS Server.
 
-Requirements:
+__Requirements:__
 
 Also ensure that the disks used to store files on the Linux servers are adequately partitioned and managed through programs such as `gdisk` and `LVM` respectively.
 
-Your 3-Tier Setup
+__Your 3-Tier Setup__
 
 * A Laptop or PC to serve as a client
 
@@ -97,7 +97,7 @@ Results:
 
 3. Connect to your linux server and check what block devices are attached using this command: `$ lsblk`
 
-Notice names of your newly created devices. All devices in linux resides in /dev/directory. Inspect it with `$ ls /dev/` and make sure you see all 3 newly created block devices there - their names will likely be `xvdf` , `xvdg` , `xvdh` .
+Take notes of the names of your newly created devices. All devices in linux resides in /dev/directory. Inspect it with `$ ls /dev/` and make sure you see all 3 newly created block devices there - their names will likely be `xvdf` , `xvdg` , `xvdh` .
 
 Results:
 
@@ -185,7 +185,7 @@ Results:
 ![](./images/14.png)
 
 
- Then Run `$ sudo lvmdiskscan` command to check for available partitions.
+ Then run `$ sudo lvmdiskscan` command to check for available partitions.
 
  Results:
 
@@ -317,7 +317,9 @@ Results:
 ![](./images/40.png)
 
 
-16. Create __/home/recovery/logs__ to store backup of log data
+16. Create __/home/recovery/logs__ to store backup of log data.
+
+This will create a directory named "logs" within the "recovery" directory located at "/home," and store backups of log data in it
 
 `sudo mkdir -p /home/recovery/logs`
 
@@ -527,7 +529,7 @@ NOTE: db-lv will be used to store data for the Website while, logs-lv will be us
 `sudo lvcreate -n db-lv -L 14G dbdata-vg`
 
 `sudo lvcreate -n logs-lv -L 14G dbdata-vg`
-
+ 
 Result:
 
 ![](./images/64.png)
@@ -541,6 +543,8 @@ Result:
 
 
 We need to verify all we have done so far on the database server instance so far with these commands.
+
+The "vgdisplay" command in Linux is used to display information about volume groups (VGs). If you want to view the complete setup, including information about physical volumes (PVs) and logical volumes (LVs), you can use the "-v" option to get a verbose display.
 
 `sudo vgdisplay -v #view complete setup - VG, PV, and LV`
 
@@ -681,6 +685,18 @@ Install wget, Apache and it’s dependencies
 
 `sudo yum -y install wget httpd php php-mysqlnd php-fpm php-json`
 
+__wget__: A command-line tool for downloading files from the internet.
+
+__httpd__: The Apache HTTP server, which is used for serving web content.
+
+__php__: The PHP programming language.
+
+__php-mysqlnd__: The MySQL native driver for PHP, used for connecting PHP to MySQL databases.
+
+__php-fpm__: PHP FastCGI Process Manager, which is used for running PHP scripts via FastCGI.
+
+__php-json__: The JSON extension for PHP, which allows you to work with JSON data in PHP scripts.
+
 Result:
 
 ![](./images/80.png)
@@ -751,7 +767,7 @@ Result:
 Download wordpress and copy wordpress to `/var/www/html`
 
 
-Create directory wordpress and cd into the directory.
+Create a directory named __"wordpress"__ and cd into the directory.
 
 `mkdir wordpress`
 
@@ -779,7 +795,7 @@ __NoTE: wordpress/wp-config.php"__ will be created.
 
 `sudo cp wordpress/wp-config-sample.php wordpress/wp-config.php`
 
-Copy wordpress into "/var/www/html".
+Copy "wordpress" into "/var/www/html".
 
 Result:
 
@@ -796,6 +812,8 @@ Result:
 
 
 Configure SELinux Policies
+
+Configuring SELinux (Security-Enhanced Linux) policies are used to control access and permissions for processes and users on a Linux system.
 
 `sudo chown -R apache:apache /var/www/html/`
 
@@ -841,19 +859,19 @@ Result:
 ![](./images/93.png)
 
 
-## Configuring the DB to work with WordPress
+__Configuring the DB to work with WordPress__
 
 
-On your db-server, We need to create a user for the wordpress server to connect to the database.
+On your db-server terminal, We need to create a user for the wordpress server to connect to the database.
 
 `sudo mysql`
 
 `mysql>` CREATE DATABASE wordpress;
 
-`mysql>` CREATE USER 'myuser'@'(Web-Server-Private-IP-Address)' 
-IDENTIFIED BY 'mypass';
+`mysql>` CREATE USER 'ogechukwu'@'(Web-Server-Private-IP-Address)' 
+IDENTIFIED BY 'Ogechukwu@1';
 
-`mysql>` GRANT ALL ON wordpress.* TO 'myuser'@'(Web-Server-Private-IP-Address)';
+`mysql>` GRANT ALL ON wordpress.* TO 'ogechukwu'@'(Web-Server-Private-IP-Address)';
 
 `mysql>` FLUSH PRIVILEGES;
 
@@ -872,13 +890,12 @@ Result:
 
 Here we are to open MySQL port 3306 on DB Server EC2. For extra security, you shall allow access to the DB server ONLY from your Web Server’s IP address, so in the Inbound Rule configuration specify source as /32.
 
-Result:
 
-open port 3306 on your db-server and input your webserver private ip address/32 on the source.
+i.e open port 3306 on your db-server and input your webserver private ip address/32 on the source.
 
 ![](./images/101.png)
 
-Go to your webserver and install MySQL client and test that you can connect from your Web Server to your DB server by using mysql-client
+Go to your webserver terminal and install MySQL client and test that you can connect from your Web Server to your DB server by using mysql-client
 
 
 
@@ -897,7 +914,7 @@ Note that, it's the name of the user and password you created in mysql server on
 
 `sudo mysql -u ogechukwu -p -h 172.31.6.33`
 
-password:Ogechukwu@1
+Enter password:Ogechukwu@1
 
 Result:
 
@@ -906,13 +923,17 @@ Result:
 
 Verify if you can successfully execute SHOW DATABASES; command and see a list of existing databases.
 
+`sudo mysql`
+
+`mysql> SHOW DATABASES;`
+
 Result:
 
 ![](./images/105.png)
 
 
+ Change permissions and configuration so Apache could use WordPress:
 
-## Change permissions and configuration so Apache could use WordPress:
 
 Here we need to create a configuration file for wordpress in order to point client requests to the wordpress directory.
 
@@ -925,7 +946,7 @@ Result:
 
 And copy and paste the lines below:
 
-The ip address is the private ip of your db-server.
+__N/B__: The ip address is the private ip of your db-server.
 
 
 `<VirtualHost *:80>`
@@ -968,6 +989,8 @@ Result:
 
 Edit the wp-config file.
 
+_Never share your "wp-config.php" file publicly, as it contains sensitive information about your WordPress installation._
+
 `sudo vi /var/www/html/wordpress/wp-config.php`
 
 Result:
@@ -996,7 +1019,7 @@ Result:
 
 
 
-Go to you webserver and Enable TCP port 80 in Inbound Rules configuration for your Web Server EC2 (enable from everywhere 0.0.0.0/0 or from your workstation’s IP)
+Go to you webserver and Enable TCP port 80 in Inbound Rules configuration, for your Web Server EC2 (enable from everywhere 0.0.0.0/0 or from your workstation’s IP)
 
 Result:
 
@@ -1009,7 +1032,7 @@ Try to access from your browser the link to your WordPress.
 
 `http://<Web-Server-Public-IP-Address>/wordpress/`
 
-paste your public ip address of your webserver on your browser.
+_i.e paste your public ip address of your webserver on your browser._
 
 Result:
 
