@@ -166,7 +166,7 @@ __MAJ:MIN__: The major and minor device numbers.
 
 __RM__: whether the device is removable (0 for no, 1 for yes).
 
-__SIZE__: The size of thr device.
+__SIZE__: The size of the device.
 
 __RO__: whether the device is read-only (0 for no, 1 for yes)
 
@@ -193,7 +193,7 @@ Results:
 
 
 
-7. Use pvcreate utility to mark each of 3 disks as physical volumes (PVs) to be used by LVM.
+7. Use "pvcreate" utility to mark each of 3 disks as physical volumes (PVs) to be used by LVM.
 
 __pvcreate__: it is used to create physical volumes (pvs) in the context of logical volume management (lvm) on a linux system. Physical volumes are the first set in setting up LVM and they are used to manage storage devices like hard drives or partitions.
 
@@ -231,14 +231,16 @@ Results:
 
 ![](./images/30.png)
 
-10. Verify that your VG has been created successfully by running: `$ sudo vgs`
+10. Verify that your VG has been created successfully by running:
+
+ `sudo vgs`
 
 Results:
 
 ![](./images/31.png)
 
 
-11. Use lvcreate utility to create 2 logical volumes. __apps-lv__ (Use half of the PV size), and __logs-lv__ Use the remaining space of the PV size.
+11. Use "lvcreate" utility to create 2 logical volumes. __apps-lv__ (Use half of the PV size), and __logs-lv__ Use the remaining space of the PV size.
 
  __NOTE:__ __apps-lv__ will be used to store data for the Website while, __logs-lv__ will be used to store data for logs.
 
@@ -263,7 +265,9 @@ Results:
 ![](./images/32.png)
 
 
-12. Verify that your logical volume has been created successfully by running: `$ sudo lvs`
+12. Verify that your logical volume has been created successfully by running: 
+
+`sudo lvs`
 
 Results:
 
@@ -331,6 +335,12 @@ Results:
 
 `sudo mount /dev/webdata-vg/apps-lv /var/www/html/`
 
+__mount:__ This is the command for mounting devices or partitions in Linux.
+
+__/dev/webdata-vg/apps-lv:__ This is the source device or partition that you want to mount. 
+
+__/var/www/html/:__ This is the target directory where the contents of the source device or partition will be mounted.
+
 Results:
 
 ![](./images/42.png)
@@ -340,6 +350,18 @@ Results:
 18. Use `rsync` utility to backup all the files in the log directory __/var/log__ into __/home/recovery/logs__ (This is required before mounting the file system)
 
 `sudo rsync -av /var/log/. /home/recovery/logs/`
+
+__rsync:__ This is the command used for file synchronization.
+
+__-av:__ These are options that modify the behavior of rsync:
+
+__-a:__ Archive mode, which preserves various file attributes and permissions while copying.
+
+__-v:__ Verbose mode, which shows the files being copied.
+
+__/var/log/:__ This is the source directory from which you are copying the contents.
+
+__/home/recovery/logs/:__ This is the destination directory where you are copying the contents to.
 
 Results:
 
@@ -366,6 +388,8 @@ Results:
 
 
 21. Update `/etc/fstab` file so that the mount configuration will persist after restart of the server.
+
+"Updating /etc/fstab file" in a Linux system is typically done to configure and manage file system mounts and devices, such as hard drives, partitions, and network shares. 
 
 The UUID of the device will be used to update the `/etc/fstab` file.
 
@@ -397,7 +421,9 @@ Results:
 `sudo systemctl daemon-reload`
 
 
-23. Verify your setup by running `df -h`, output must look like this:
+23. Verify your setup by running df -h, output must look like this:
+
+`df -h`
 
 Results:
 
